@@ -1,16 +1,18 @@
-from app.data.portfolio import MOCK_HOLDINGS
+from app.repositories.portfolio_repository import get_holdings
 from app.schemas.portfolio import Portfolio
 
 
 def get_portfolio() -> Portfolio:
+    holdings = get_holdings()
+
     total_invested = sum(
         holding.invested_value
-        for holding in MOCK_HOLDINGS
+        for holding in holdings
     )
 
     total_current_value = sum(
         holding.current_value
-        for holding in MOCK_HOLDINGS
+        for holding in holdings
     )
 
     total_pnl = total_current_value - total_invested
@@ -22,7 +24,7 @@ def get_portfolio() -> Portfolio:
     )
 
     return Portfolio(
-        holdings=MOCK_HOLDINGS,
+        holdings=holdings,
         total_invested=total_invested,
         total_current_value=total_current_value,
         total_pnl=total_pnl,
