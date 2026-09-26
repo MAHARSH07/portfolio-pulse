@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import TransactionList from "./components/TransactionList";
 
 function App() {
   const [portfolio, setPortfolio] = useState(null);
@@ -80,6 +81,7 @@ function App() {
           ))}
         </tbody>
       </table>
+      <TransactionList />
     </div>
   );
 }

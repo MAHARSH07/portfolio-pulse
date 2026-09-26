@@ -1,9 +1,11 @@
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from sqlalchemy import select
 
 from app.db.database import Base, SessionLocal, engine
 from app.models.holding import HoldingModel
+from app.models.transaction import TransactionModel
 
 
 INITIAL_HOLDINGS = [
@@ -31,6 +33,58 @@ INITIAL_HOLDINGS = [
 ]
 
 
+INITIAL_TRANSACTIONS = [
+    TransactionModel(
+        symbol="KPIT",
+        transaction_type="BUY",
+        quantity=5,
+        price=Decimal("850.00"),
+        transaction_date=datetime(
+            2026,
+            1,
+            15,
+            tzinfo=timezone.utc,
+        ),
+    ),
+    TransactionModel(
+        symbol="KPIT",
+        transaction_type="BUY",
+        quantity=5,
+        price=Decimal("950.00"),
+        transaction_date=datetime(
+            2026,
+            2,
+            20,
+            tzinfo=timezone.utc,
+        ),
+    ),
+    TransactionModel(
+        symbol="INFY",
+        transaction_type="BUY",
+        quantity=5,
+        price=Decimal("1500.00"),
+        transaction_date=datetime(
+            2026,
+            1,
+            25,
+            tzinfo=timezone.utc,
+        ),
+    ),
+    TransactionModel(
+        symbol="TCS",
+        transaction_type="BUY",
+        quantity=3,
+        price=Decimal("3500.00"),
+        transaction_date=datetime(
+            2026,
+            2,
+            10,
+            tzinfo=timezone.utc,
+        ),
+    ),
+]
+
+
 def initialize_database() -> None:
     Base.metadata.create_all(bind=engine)
 
@@ -41,14 +95,19 @@ def initialize_database() -> None:
             select(HoldingModel).limit(1)
         ).first()
 
-        if existing_holding:
-            print("Holdings already exist. Skipping seed.")
-            return
+        if not existing_holding:
+            db.add_all(INITIAL_HOLDINGS)
 
-        db.add_all(INITIAL_HOLDINGS)
+        existing_transaction = db.scalars(
+            select(TransactionModel).limit(1)
+        ).first()
+
+        if not existing_transaction:
+            db.add_all(INITIAL_TRANSACTIONS)
+
         db.commit()
 
-        print("Database initialized and holdings seeded.")
+        print("Database initialization completed.")
 
     finally:
         db.close()

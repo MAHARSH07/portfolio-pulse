@@ -4,6 +4,7 @@ from sqlalchemy import text
 from app.db.database import engine
 
 from app.routers.portfolio import router as portfolio_router
+from app.routers.transaction import router as transaction_router
 
 
 app = FastAPI(
@@ -26,6 +27,7 @@ app.add_middleware(
 
 
 app.include_router(portfolio_router)
+app.include_router(transaction_router)
 
 
 @app.get("/")
