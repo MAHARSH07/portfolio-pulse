@@ -12,6 +12,7 @@ function Dashboard({
     lastUpdated,
     notification,
     onCloseNotification,
+    onSelectHolding,
 }) {
     return (
         <>
@@ -99,7 +100,10 @@ function Dashboard({
                     </div>
                 </div>
 
-                <HoldingsTable holdings={portfolio.holdings} />
+                <HoldingsTable
+                    holdings={portfolio.holdings}
+                    onSelectHolding={onSelectHolding}
+                />
             </section>
         </>
     );

@@ -3,6 +3,7 @@ import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Notification from "./components/ui/Notification";
 import "./App.css";
+import StockDetail from "./components/portfolio/StockDetail";
 
 function App() {
   const [portfolio, setPortfolio] = useState(null);
@@ -11,6 +12,7 @@ function App() {
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [selectedSymbol, setSelectedSymbol] = useState(null);
 
   async function loadPortfolio({ isRefresh = false } = {}) {
     try {
@@ -59,6 +61,10 @@ function App() {
     }
   }
 
+  const selectedHolding = portfolio?.holdings.find(
+    (holding) => holding.symbol === selectedSymbol
+  );
+
   useEffect(() => {
     loadPortfolio();
   }, []);
@@ -74,14 +80,26 @@ function App() {
       )}
 
       {!loading && !error && portfolio && (
-        <Dashboard
-          portfolio={portfolio}
-          onRefresh={() => loadPortfolio({ isRefresh: true })}
-          refreshing={refreshing}
-          lastUpdated={lastUpdated}
-          notification={notification}
-          onCloseNotification={() => setNotification(null)}
-        />
+        selectedHolding ? (
+          <StockDetail
+            holding={selectedHolding}
+            onBack={() => setSelectedSymbol(null)}
+          />
+        ) : (
+          <Dashboard
+            portfolio={portfolio}
+            onRefresh={() =>
+              loadPortfolio({ isRefresh: true })
+            }
+            refreshing={refreshing}
+            lastUpdated={lastUpdated}
+            notification={notification}
+            onCloseNotification={() =>
+              setNotification(null)
+            }
+            onSelectHolding={setSelectedSymbol}
+          />
+        )
       )}
     </AppLayout>
   );
