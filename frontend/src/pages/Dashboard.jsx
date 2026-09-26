@@ -3,15 +3,22 @@ import PortfolioSummary from "../components/portfolio/PortfolioSummary";
 import PerformanceCard from "../components/portfolio/PerformanceCard";
 import HoldingsTable from "../components/portfolio/HoldingsTable";
 import AllocationCard from "../components/portfolio/AllocationCard";
+import Notification from "../components/ui/Notification";
 
 function Dashboard({
     portfolio,
     onRefresh,
     refreshing,
     lastUpdated,
+    notification,
+    onCloseNotification,
 }) {
     return (
         <>
+            <Notification
+                notification={notification}
+                onClose={onCloseNotification}
+            />
             <section className="page-header">
                 <div>
                     <p className="eyebrow">OVERVIEW</p>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
+import Notification from "./components/ui/Notification";
 import "./App.css";
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [notification, setNotification] = useState(null);
 
   async function loadPortfolio({ isRefresh = false } = {}) {
     try {
@@ -32,8 +34,22 @@ function App() {
 
       setPortfolio(data);
       setLastUpdated(new Date());
+
+      if (isRefresh) {
+        setNotification({
+          type: "success",
+          message: "Portfolio refreshed successfully.",
+        });
+      }
     } catch (err) {
-      setError(err.message);
+      if (isRefresh) {
+        setNotification({
+          type: "error",
+          message: "Unable to refresh portfolio. Please try again.",
+        });
+      } else {
+        setError(err.message);
+      }
     } finally {
       if (isRefresh) {
         setRefreshing(false);
@@ -63,6 +79,8 @@ function App() {
           onRefresh={() => loadPortfolio({ isRefresh: true })}
           refreshing={refreshing}
           lastUpdated={lastUpdated}
+          notification={notification}
+          onCloseNotification={() => setNotification(null)}
         />
       )}
     </AppLayout>
