@@ -22,9 +22,9 @@ class HoldingModel(Base):
         nullable=False,
     )
 
-    company_name: Mapped[str] = mapped_column(
+    company_name: Mapped[str | None] = mapped_column(
         String(200),
-        nullable=False,
+        nullable=True,
     )
 
     quantity: Mapped[int] = mapped_column(

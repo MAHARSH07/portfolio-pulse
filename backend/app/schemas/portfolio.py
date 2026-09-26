@@ -5,7 +5,7 @@ class Holding(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     symbol: str
-    company_name: str
+    company_name: str | None = None
     quantity: int
     average_price: float
     current_price: float
