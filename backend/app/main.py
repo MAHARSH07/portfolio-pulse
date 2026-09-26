@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from app.db.database import engine
 
 from app.routers.portfolio import router as portfolio_router
 
@@ -39,3 +41,23 @@ def health_check():
     return {
         "status": "healthy"
     }
+
+@app.get("/db-health")
+def database_health_check():
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+
+        return {
+            "status": "healthy",
+            "database": "connected",
+        }
+
+    except Exception as exc:
+        print(f"Database connection error: {exc}")
+
+        return {
+            "status": "unhealthy",
+            "database": "disconnected",
+            "error": str(exc),
+        }

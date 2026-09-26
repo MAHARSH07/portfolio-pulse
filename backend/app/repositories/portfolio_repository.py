@@ -1,6 +1,10 @@
-from app.data.portfolio import MOCK_HOLDINGS
-from app.schemas.portfolio import Holding
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.models.holding import HoldingModel
 
 
-def get_holdings() -> list[Holding]:
-    return MOCK_HOLDINGS
+def get_holdings(db: Session) -> list[HoldingModel]:
+    statement = select(HoldingModel).order_by(HoldingModel.symbol)
+
+    return list(db.scalars(statement).all())

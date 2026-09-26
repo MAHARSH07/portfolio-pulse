@@ -1,9 +1,16 @@
+from sqlalchemy.orm import Session
+
 from app.repositories.portfolio_repository import get_holdings
-from app.schemas.portfolio import Portfolio
+from app.schemas.portfolio import Holding, Portfolio
 
 
-def get_portfolio() -> Portfolio:
-    holdings = get_holdings()
+def get_portfolio(db: Session) -> Portfolio:
+    holding_models = get_holdings(db)
+
+    holdings = [
+        Holding.model_validate(holding_model)
+        for holding_model in holding_models
+    ]
 
     total_invested = sum(
         holding.invested_value

@@ -1,7 +1,9 @@
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, ConfigDict, computed_field
 
 
 class Holding(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     symbol: str
     company_name: str
     quantity: int
