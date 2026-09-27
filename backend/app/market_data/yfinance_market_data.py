@@ -16,23 +16,37 @@ class YFinanceMarketDataProvider(MarketDataProvider):
             return {}
 
         timestamp = datetime.now(timezone.utc)
-        prices: dict[str, PriceSnapshot] = {}
 
-        for symbol in symbols:
-            yahoo_symbol = f"{symbol}.NS"
+        yahoo_symbols = [
+            f"{symbol}.NS"
+            for symbol in symbols
+        ]
 
-            try:
-                ticker = yf.Ticker(yahoo_symbol)
-                price = ticker.fast_info.last_price
-            except Exception:
-                prices[symbol] = PriceSnapshot(
+        try:
+            tickers = yf.Tickers(" ".join(yahoo_symbols))
+        except Exception:
+            return {
+                symbol: PriceSnapshot(
                     symbol=symbol,
                     price=None,
                     timestamp=timestamp,
                     source="yfinance",
                     status=PriceStatus.UNAVAILABLE,
                 )
-                continue
+                for symbol in symbols
+            }
+
+        prices: dict[str, PriceSnapshot] = {}
+
+        for symbol, yahoo_symbol in zip(
+            symbols,
+            yahoo_symbols,
+        ):
+            try:
+                ticker = tickers.tickers[yahoo_symbol]
+                price = ticker.fast_info.last_price
+            except Exception:
+                price = None
 
             if price is None:
                 prices[symbol] = PriceSnapshot(
@@ -46,7 +60,7 @@ class YFinanceMarketDataProvider(MarketDataProvider):
 
             prices[symbol] = PriceSnapshot(
                 symbol=symbol,
-                price=Decimal(str(price)),
+                price=Decimal(str(price)).quantize(Decimal("0.01")),
                 timestamp=timestamp,
                 source="yfinance",
                 status=PriceStatus.DELAYED,
