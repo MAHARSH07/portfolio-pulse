@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, computed_field
@@ -11,6 +12,9 @@ class Holding(BaseModel):
     quantity: int
     average_price: Decimal
     current_price: Decimal
+    price_source: str | None = None
+    price_status: str | None = None
+    price_timestamp: datetime | None = None
 
     @computed_field
     @property

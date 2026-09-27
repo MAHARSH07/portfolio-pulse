@@ -1,8 +1,4 @@
-import {
-  BriefcaseBusiness,
-  CircleDollarSign,
-  TrendingUp,
-} from "lucide-react";
+import { BriefcaseBusiness, CircleDollarSign, TrendingUp } from "lucide-react";
 import MetricCard from "../ui/MetricCard";
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
@@ -19,14 +15,31 @@ function PortfolioSummary({ portfolio }) {
   const holdingsCount = portfolio.holdings.length;
 
   const hasMarketData = portfolio.holdings.some(
-    (holding) => Number(holding.current_price) > 0
+    (holding) => Number(holding.current_price) > 0,
   );
+
+  const priceStatuses = portfolio.holdings
+    .filter((holding) => Number(holding.current_price) > 0)
+    .map((holding) => holding.price_status);
+
+  const hasRealTimePrices = priceStatuses.some(
+    (status) => status === "REAL_TIME",
+  );
+
+  const hasDelayedPrices = priceStatuses.some((status) => status === "DELAYED");
+
+  const priceDescription = !hasMarketData
+    ? "Market prices unavailable"
+    : hasRealTimePrices && !hasDelayedPrices
+      ? "Based on real-time prices"
+      : hasDelayedPrices && !hasRealTimePrices
+        ? "Based on delayed prices"
+        : "Based on mixed price data";
 
   const investedValue = Number(portfolio.total_invested) || 0;
   const currentValue = Number(portfolio.total_current_value) || 0;
   const pnl = Number(portfolio.total_pnl) || 0;
-  const pnlPercentage =
-    Number(portfolio.total_pnl_percentage) || 0;
+  const pnlPercentage = Number(portfolio.total_pnl_percentage) || 0;
 
   return (
     <section className="metrics-grid">
@@ -44,11 +57,7 @@ function PortfolioSummary({ portfolio }) {
       <MetricCard
         label="Current value"
         value={hasMarketData ? formatCurrency(currentValue) : "—"}
-        meta={
-          hasMarketData
-            ? "Based on live prices"
-            : "Market prices unavailable"
-        }
+        meta={priceDescription}
         secondary={
           hasMarketData
             ? "Current portfolio valuation"
@@ -61,9 +70,7 @@ function PortfolioSummary({ portfolio }) {
       <MetricCard
         label="Unrealized P&L"
         value={
-          hasMarketData
-            ? `${pnl >= 0 ? "+" : ""}${formatCurrency(pnl)}`
-            : "—"
+          hasMarketData ? `${pnl >= 0 ? "+" : ""}${formatCurrency(pnl)}` : "—"
         }
         meta={
           hasMarketData
@@ -76,13 +83,7 @@ function PortfolioSummary({ portfolio }) {
             : "P&L will appear after price sync"
         }
         icon={TrendingUp}
-        status={
-          !hasMarketData
-            ? "pending"
-            : pnl >= 0
-              ? "positive"
-              : "negative"
-        }
+        status={!hasMarketData ? "pending" : pnl >= 0 ? "positive" : "negative"}
       />
     </section>
   );

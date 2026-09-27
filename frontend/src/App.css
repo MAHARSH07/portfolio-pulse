@@ -859,6 +859,12 @@
     white-space: nowrap;
 }
 
+.price-status {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
 .holdings-footer {
     display: flex;
     align-items: center;

@@ -44,6 +44,9 @@ def get_portfolio(db: Session) -> Portfolio:
             quantity=holding_model.quantity,
             average_price=holding_model.average_price,
             current_price=current_price,
+            price_source=price_snapshot.source if price_snapshot else None,
+            price_status=price_snapshot.status if price_snapshot else None,
+            price_timestamp=price_snapshot.timestamp if price_snapshot else None,
         )
 
         holdings.append(holding)
