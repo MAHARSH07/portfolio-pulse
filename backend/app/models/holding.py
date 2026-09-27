@@ -37,11 +37,6 @@ class HoldingModel(Base):
         nullable=False,
     )
 
-    current_price: Mapped[Decimal] = mapped_column(
-        Numeric(12, 2),
-        nullable=False,
-    )
-
     broker: Mapped[str] = mapped_column(
         String(50),
         nullable=False,

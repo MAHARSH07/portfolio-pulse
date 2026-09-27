@@ -30,15 +30,21 @@ def get_portfolio(db: Session) -> Portfolio:
     holdings = []
 
     for holding_model in holding_models:
-        holding = Holding.model_validate(holding_model)
+        price_snapshot = prices.get(holding_model.symbol)
 
-        price_snapshot = prices.get(holding.symbol)
+        current_price = (
+            price_snapshot.price
+            if price_snapshot is not None and price_snapshot.price is not None
+            else Decimal("0.00")
+        )
 
-        if (
-            price_snapshot is not None
-            and price_snapshot.price is not None
-        ):
-            holding.current_price = price_snapshot.price
+        holding = Holding(
+            symbol=holding_model.symbol,
+            company_name=holding_model.company_name,
+            quantity=holding_model.quantity,
+            average_price=holding_model.average_price,
+            current_price=current_price,
+        )
 
         holdings.append(holding)
 

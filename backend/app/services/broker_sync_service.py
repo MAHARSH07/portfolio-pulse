@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -60,7 +58,6 @@ def sync_holdings(
                 company_name=broker_holding.company_name,
                 quantity=broker_holding.quantity,
                 average_price=broker_holding.average_price,
-                current_price=Decimal("0.00"),
                 broker=broker_name,
             )
 
