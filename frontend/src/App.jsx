@@ -1,9 +1,16 @@
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 import { useEffect, useState } from "react";
 import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Notification from "./components/ui/Notification";
 import "./App.css";
 import StockDetail from "./components/portfolio/StockDetail";
+import PlaceholderPage from "./pages/PlaceholderPage";
 
 function App() {
   const [portfolio, setPortfolio] = useState(null);
@@ -70,38 +77,135 @@ function App() {
   }, []);
 
   return (
-    <AppLayout>
-      {loading && <div className="state-card">Loading portfolio...</div>}
+    <BrowserRouter>
+      <AppLayout>
+        {loading && (
+          <div className="state-card">
+            Loading portfolio...
+          </div>
+        )}
 
-      {!loading && error && (
-        <div className="state-card error-state">
-          {error}
-        </div>
-      )}
+        {!loading && error && (
+          <div className="state-card error-state">
+            {error}
+          </div>
+        )}
 
-      {!loading && !error && portfolio && (
-        selectedHolding ? (
-          <StockDetail
-            holding={selectedHolding}
-            onBack={() => setSelectedSymbol(null)}
-          />
-        ) : (
-          <Dashboard
-            portfolio={portfolio}
-            onRefresh={() =>
-              loadPortfolio({ isRefresh: true })
-            }
-            refreshing={refreshing}
-            lastUpdated={lastUpdated}
-            notification={notification}
-            onCloseNotification={() =>
-              setNotification(null)
-            }
-            onSelectHolding={setSelectedSymbol}
-          />
-        )
-      )}
-    </AppLayout>
+        {!loading && !error && portfolio && (
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Navigate
+                  to="/overview"
+                  replace
+                />
+              }
+            />
+
+            <Route
+              path="/overview"
+              element={
+                selectedHolding ? (
+                  <StockDetail
+                    holding={selectedHolding}
+                    onBack={() =>
+                      setSelectedSymbol(null)
+                    }
+                  />
+                ) : (
+                  <Dashboard
+                    portfolio={portfolio}
+                    onRefresh={() =>
+                      loadPortfolio({
+                        isRefresh: true,
+                      })
+                    }
+                    refreshing={refreshing}
+                    lastUpdated={lastUpdated}
+                    notification={notification}
+                    onCloseNotification={() =>
+                      setNotification(null)
+                    }
+                    onSelectHolding={setSelectedSymbol}
+                  />
+                )
+              }
+            />
+
+            <Route
+              path="/portfolio"
+              element={
+                <PlaceholderPage
+                  title="Portfolio"
+                  description="Explore your holdings, positions, transactions, and portfolio history."
+                />
+              }
+            />
+
+            <Route
+              path="/market"
+              element={
+                <PlaceholderPage
+                  title="Market"
+                  description="Track the market conditions and the data that matters to your portfolio."
+                />
+              }
+            />
+
+            <Route
+              path="/news"
+              element={
+                <PlaceholderPage
+                  title="News"
+                  description="See market and company news filtered around your portfolio."
+                />
+              }
+            />
+
+            <Route
+              path="/alerts"
+              element={
+                <PlaceholderPage
+                  title="Alerts"
+                  description="Important portfolio events and market signals will appear here."
+                />
+              }
+            />
+
+            <Route
+              path="/assistant"
+              element={
+                <PlaceholderPage
+                  title="AI Assistant"
+                  description="Your portfolio-aware intelligence assistant will live here."
+                />
+              }
+            />
+
+            <Route
+              path="/settings"
+              element={
+                <PlaceholderPage
+                  title="Settings"
+                  description="Manage your PortfolioPulse account, broker connection, and preferences."
+                />
+              }
+            />
+
+            <Route
+              path="*"
+              element={
+                <Navigate
+                  to="/overview"
+                  replace
+                />
+              }
+            />
+          </Routes>
+        )}
+      </AppLayout>
+    </BrowserRouter>
   );
 }
 

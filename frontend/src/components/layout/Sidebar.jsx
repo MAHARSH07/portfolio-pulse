@@ -6,32 +6,38 @@ import {
   Bot,
   Settings,
 } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 const navigationItems = [
   {
     label: "Overview",
     icon: LayoutDashboard,
-    active: true,
+    path: "/overview",
   },
   {
     label: "Portfolio",
     icon: BriefcaseBusiness,
+    path: "/portfolio",
   },
   {
     label: "Market",
     icon: Newspaper,
+    path: "/market",
   },
   {
     label: "News",
     icon: Newspaper,
+    path: "/news",
   },
   {
     label: "Alerts",
     icon: Bell,
+    path: "/alerts",
   },
   {
     label: "AI Assistant",
     icon: Bot,
+    path: "/assistant",
   },
 ];
 
@@ -54,22 +60,31 @@ function Sidebar() {
           const Icon = item.icon;
 
           return (
-            <button
+            <NavLink
               key={item.label}
-              className={`nav-item ${item.active ? "active" : ""}`}
+              to={item.path}
+              end={item.path === "/overview"}
+              className={({ isActive }) =>
+                `nav-item ${isActive ? "active" : ""}`
+              }
             >
               <Icon size={18} strokeWidth={1.8} />
               <span>{item.label}</span>
-            </button>
+            </NavLink>
           );
         })}
       </nav>
 
       <div className="sidebar-bottom">
-        <button className="nav-item">
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            `nav-item ${isActive ? "active" : ""}`
+          }
+        >
           <Settings size={18} strokeWidth={1.8} />
           <span>Settings</span>
-        </button>
+        </NavLink>
 
         <div className="sidebar-status">
           <div className="status-dot" />
