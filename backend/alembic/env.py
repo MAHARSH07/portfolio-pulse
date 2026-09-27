@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.db.database import Base
 from app.models.holding import HoldingModel
 from app.models.transaction import TransactionModel
+from app.models.instrument import InstrumentModel
 
 config = context.config
 
