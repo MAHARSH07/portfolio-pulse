@@ -1,7 +1,7 @@
 from decimal import Decimal
 
-from sqlalchemy import Integer, Numeric, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Integer, Numeric, String, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
 
@@ -15,16 +15,22 @@ class HoldingModel(Base):
         autoincrement=True,
     )
 
+    instrument_id: Mapped[int] = mapped_column(
+        ForeignKey("instruments.id"),
+        nullable=False,
+        index=True,
+    )
+
+    instrument: Mapped["InstrumentModel"] = relationship(
+        "InstrumentModel",
+        back_populates="holdings",
+    )
+
     symbol: Mapped[str] = mapped_column(
         String(20),
         unique=True,
         index=True,
         nullable=False,
-    )
-
-    company_name: Mapped[str | None] = mapped_column(
-        String(200),
-        nullable=True,
     )
 
     quantity: Mapped[int] = mapped_column(

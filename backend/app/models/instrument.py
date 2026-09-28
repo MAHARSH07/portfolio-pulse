@@ -2,8 +2,8 @@ from datetime import datetime
 from decimal import Decimal
 
 from sqlalchemy import DateTime, Integer, Numeric, String
-from sqlalchemy.orm import Mapped, mapped_column
-
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.models.holding import HoldingModel
 from app.db.database import Base
 
 
@@ -82,4 +82,9 @@ class InstrumentModel(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
+    )
+
+    holdings: Mapped[list["HoldingModel"]] = relationship(
+        "HoldingModel",
+        back_populates="instrument",
     )

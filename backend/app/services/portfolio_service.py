@@ -40,7 +40,7 @@ def get_portfolio(db: Session) -> Portfolio:
 
         holding = Holding(
             symbol=holding_model.symbol,
-            company_name=holding_model.company_name,
+            company_name=holding_model.instrument.name,
             quantity=holding_model.quantity,
             average_price=holding_model.average_price,
             current_price=current_price,
