@@ -7,6 +7,7 @@ from app.routers.portfolio import router as portfolio_router
 from app.routers.transaction import router as transaction_router
 from app.routers.sync import router as sync_router
 from app.routers.groww import router as groww_router
+from app.routers.ai import router as ai_router
 
 app = FastAPI(
     title="PortfolioPulse API",
@@ -31,6 +32,7 @@ app.include_router(portfolio_router)
 app.include_router(transaction_router)
 app.include_router(sync_router)
 app.include_router(groww_router)
+app.include_router(ai_router)
 
 
 @app.get("/")

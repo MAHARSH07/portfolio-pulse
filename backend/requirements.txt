@@ -7,3 +7,6 @@ growwapi
 httpx
 yfinance
 alembic
+langgraph
+langchain
+langchain-ollama

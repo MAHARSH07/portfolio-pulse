@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     groww_api_key: str | None = None
     groww_api_secret: str | None = None
     twelve_data_api_key: str | None = None
+    
+    llm_provider: str = "ollama"
+    llm_model: str = "qwen3.5:9b"
+    ollama_base_url: str = "http://localhost:11434"
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
