@@ -4,7 +4,9 @@ from app.ai.tools.web_search import search_web_tool
 def main():
     result = search_web_tool.invoke(
         {
-            "query": "KPIT Technologies latest news"
+            "query": "KPIT Technologies",
+            "topic": "news",
+            "days": 7,
         }
     )
 

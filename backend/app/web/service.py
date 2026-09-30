@@ -6,5 +6,14 @@ class WebSearchService:
     def __init__(self, provider: WebSearchProvider):
         self.provider = provider
 
-    def search(self, query: str) -> WebSearchResponse:
-        return self.provider.search(query)
+    def search(
+        self,
+        query: str,
+        topic: str = "general",
+        days: int | None = None,
+    ) -> WebSearchResponse:
+        return self.provider.search(
+            query=query,
+            topic=topic,
+            days=days,
+        )

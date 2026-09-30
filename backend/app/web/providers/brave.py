@@ -8,7 +8,12 @@ from app.web.schemas import WebSearchResponse, WebSearchResult
 class BraveSearchProvider(WebSearchProvider):
     BASE_URL = "https://api.search.brave.com/res/v1/web/search"
 
-    def search(self, query: str) -> WebSearchResponse:
+    def search(
+        self,
+        query: str,
+        topic: str = "general",
+        days: int | None = None,
+    ) -> WebSearchResponse:
         if not settings.brave_search_api_key:
             raise RuntimeError("BRAVE_SEARCH_API_KEY is not configured.")
 
