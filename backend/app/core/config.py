@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     groww_api_key: str | None = None
     groww_api_secret: str | None = None
     twelve_data_api_key: str | None = None
+    brave_search_api_key: str | None = None
+    tavily_api_key: str | None = None
     
     llm_provider: str = "ollama"
     llm_model: str = "qwen3.5:9b"

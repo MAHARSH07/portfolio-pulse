@@ -3,6 +3,8 @@ from langchain.agents import create_agent
 from app.ai.model import get_llm
 from app.ai.tools.portfolio import get_portfolio_tool
 from app.ai.tools.holding import get_holding_tool
+from app.ai.tools.web_search import search_web_tool
+from app.ai.prompts.system import SYSTEM_PROMPT
 
 
 def get_agent():
@@ -11,22 +13,11 @@ def get_agent():
     tools = [
         get_portfolio_tool,
         get_holding_tool,
+        search_web_tool,
     ]
 
     return create_agent(
         model=llm,
         tools=tools,
-        system_prompt=(
-            "You are PortfolioPulse, an AI investment portfolio assistant. "
-            "You have access to the user's current portfolio through tools. "
-            "Use the portfolio tool whenever the user's question requires "
-            "current portfolio information. "
-            "Do not invent portfolio values or holdings. "
-            "When portfolio prices are marked as DELAYED, make that clear "
-            "when relevant."
-            "All portfolio monetary values are in Indian Rupees (INR). "
-            "Always use ₹ or INR when presenting portfolio prices, values, "
-            "profit/loss, or investment amounts. Never use $ unless the data "
-            "explicitly represents USD."
-        ),
+        system_prompt=SYSTEM_PROMPT,
     )
