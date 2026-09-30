@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     brave_search_api_key: str | None = None
     tavily_api_key: str | None = None
     
+    web_search_provider: str = "tavily"
+    
     llm_provider: str = "ollama"
     llm_model: str = "qwen3.5:9b"
     ollama_base_url: str = "http://localhost:11434"

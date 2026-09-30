@@ -1,6 +1,6 @@
 from langchain_core.tools import tool
 
-from app.web.providers.tavily import TavilySearchProvider
+from app.web.providers.factory import get_web_search_provider
 from app.web.service import WebSearchService
 
 
@@ -12,7 +12,7 @@ def search_web_tool(query: str) -> dict:
     Use this tool when the user's question requires information that may
     have changed recently or is not available in the portfolio database.
     """
-    provider = TavilySearchProvider()
+    provider = get_web_search_provider()
     service = WebSearchService(provider)
 
     result = service.search(query)
