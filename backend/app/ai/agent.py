@@ -2,6 +2,7 @@ from langchain.agents import create_agent
 
 from app.ai.model import get_llm
 from app.ai.tools.portfolio import get_portfolio_tool
+from app.ai.tools.holding import get_holding_tool
 
 
 def get_agent():
@@ -9,6 +10,7 @@ def get_agent():
 
     tools = [
         get_portfolio_tool,
+        get_holding_tool,
     ]
 
     return create_agent(
@@ -22,5 +24,9 @@ def get_agent():
             "Do not invent portfolio values or holdings. "
             "When portfolio prices are marked as DELAYED, make that clear "
             "when relevant."
+            "All portfolio monetary values are in Indian Rupees (INR). "
+            "Always use ₹ or INR when presenting portfolio prices, values, "
+            "profit/loss, or investment amounts. Never use $ unless the data "
+            "explicitly represents USD."
         ),
     )

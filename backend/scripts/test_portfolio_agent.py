@@ -9,7 +9,7 @@ def main():
             "messages": [
                 {
                     "role": "user",
-                    "content": "How much have I invested in total?",
+                    "content": "How much am I down on KPITTECH?",
                 }
             ]
         }
