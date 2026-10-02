@@ -1,5 +1,8 @@
-import httpx
+from datetime import datetime
+from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse
+
+import httpx
 
 from app.core.config import settings
 from app.web.providers.base import WebSearchProvider
@@ -18,6 +21,16 @@ class TavilySearchProvider(WebSearchProvider):
 
         return hostname.removeprefix("www.")
 
+    @staticmethod
+    def _parse_published_at(value: str | None) -> datetime | None:
+        if not value:
+            return None
+
+        try:
+            return parsedate_to_datetime(value)
+        except (TypeError, ValueError):
+            return None
+
     def search(
         self,
         query: str,
@@ -30,7 +43,7 @@ class TavilySearchProvider(WebSearchProvider):
         payload = {
             "query": query,
             "search_depth": "basic",
-            "max_results": 10,
+            "max_results": 5,
             "country": "india",
             "topic": topic,
         }
@@ -56,8 +69,11 @@ class TavilySearchProvider(WebSearchProvider):
             WebSearchResult(
                 title=item["title"],
                 url=item["url"],
-                description=item.get("content"),
+                description=(item.get("content") or "")[:1000],
                 source=self._get_source(item["url"]),
+                published_at=self._parse_published_at(
+                    item.get("published_date")
+                ),
             )
             for item in data.get("results", [])
         ]

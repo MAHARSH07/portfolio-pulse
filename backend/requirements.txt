@@ -10,3 +10,4 @@ alembic
 langgraph
 langchain
 langchain-ollama
+beautifulsoup4
