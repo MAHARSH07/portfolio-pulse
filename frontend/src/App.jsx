@@ -1,9 +1,4 @@
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
@@ -11,6 +6,7 @@ import Notification from "./components/ui/Notification";
 import "./App.css";
 import StockDetail from "./components/portfolio/StockDetail";
 import PlaceholderPage from "./pages/PlaceholderPage";
+import Market from "./pages/Market";
 
 function App() {
   const [portfolio, setPortfolio] = useState(null);
@@ -31,9 +27,7 @@ function App() {
 
       setError("");
 
-      const response = await fetch(
-        "http://127.0.0.1:8000/portfolio"
-      );
+      const response = await fetch("http://127.0.0.1:8000/portfolio");
 
       if (!response.ok) {
         throw new Error("Unable to load portfolio.");
@@ -69,7 +63,7 @@ function App() {
   }
 
   const selectedHolding = portfolio?.holdings.find(
-    (holding) => holding.symbol === selectedSymbol
+    (holding) => holding.symbol === selectedSymbol,
   );
 
   useEffect(() => {
@@ -79,29 +73,15 @@ function App() {
   return (
     <BrowserRouter>
       <AppLayout>
-        {loading && (
-          <div className="state-card">
-            Loading portfolio...
-          </div>
-        )}
+        {loading && <div className="state-card">Loading portfolio...</div>}
 
         {!loading && error && (
-          <div className="state-card error-state">
-            {error}
-          </div>
+          <div className="state-card error-state">{error}</div>
         )}
 
         {!loading && !error && portfolio && (
           <Routes>
-            <Route
-              path="/"
-              element={
-                <Navigate
-                  to="/overview"
-                  replace
-                />
-              }
-            />
+            <Route path="/" element={<Navigate to="/overview" replace />} />
 
             <Route
               path="/overview"
@@ -109,9 +89,7 @@ function App() {
                 selectedHolding ? (
                   <StockDetail
                     holding={selectedHolding}
-                    onBack={() =>
-                      setSelectedSymbol(null)
-                    }
+                    onBack={() => setSelectedSymbol(null)}
                   />
                 ) : (
                   <Dashboard
@@ -124,9 +102,7 @@ function App() {
                     refreshing={refreshing}
                     lastUpdated={lastUpdated}
                     notification={notification}
-                    onCloseNotification={() =>
-                      setNotification(null)
-                    }
+                    onCloseNotification={() => setNotification(null)}
                     onSelectHolding={setSelectedSymbol}
                   />
                 )
@@ -143,15 +119,7 @@ function App() {
               }
             />
 
-            <Route
-              path="/market"
-              element={
-                <PlaceholderPage
-                  title="Market"
-                  description="Track the market conditions and the data that matters to your portfolio."
-                />
-              }
-            />
+            <Route path="/market" element={<Market />} />
 
             <Route
               path="/news"
@@ -193,15 +161,7 @@ function App() {
               }
             />
 
-            <Route
-              path="*"
-              element={
-                <Navigate
-                  to="/overview"
-                  replace
-                />
-              }
-            />
+            <Route path="*" element={<Navigate to="/overview" replace />} />
           </Routes>
         )}
       </AppLayout>
