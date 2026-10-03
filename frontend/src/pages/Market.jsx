@@ -3,10 +3,13 @@ import {
     RefreshCw,
     TrendingDown,
     TrendingUp,
+    ExternalLink,
 } from "lucide-react";
 
 function Market() {
     const [market, setMarket] = useState(null);
+    const [news, setNews] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState("");
@@ -21,17 +24,32 @@ function Market() {
 
             setError("");
 
-            const response = await fetch(
-                "http://127.0.0.1:8000/market"
-            );
+            const [marketResponse, newsResponse] =
+                await Promise.all([
+                    fetch("http://127.0.0.1:8000/market"),
+                    fetch("http://127.0.0.1:8000/market/news"),
+                ]);
 
-            if (!response.ok) {
-                throw new Error("Unable to load market data.");
+            if (!marketResponse.ok) {
+                throw new Error(
+                    "Unable to load market data."
+                );
             }
 
-            const data = await response.json();
+            if (!newsResponse.ok) {
+                throw new Error(
+                    "Unable to load market news."
+                );
+            }
 
-            setMarket(data);
+            const marketData =
+                await marketResponse.json();
+
+            const newsData =
+                await newsResponse.json();
+
+            setMarket(marketData);
+            setNews(newsData.articles ?? []);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -63,20 +81,40 @@ function Market() {
         );
     }
 
-    const indianMarkets = market.instruments.filter((instrument) =>
-        ["^NSEI", "^BSESN", "^NSEBANK"].includes(
-            instrument.symbol
-        )
+    const indianMarkets = market.instruments.filter(
+        (instrument) =>
+            ["^NSEI", "^BSESN", "^NSEBANK"].includes(
+                instrument.symbol
+            )
     );
 
-    const commodities = market.instruments.filter((instrument) =>
-        ["GC=F", "SI=F"].includes(instrument.symbol)
+    const commodities = market.instruments.filter(
+        (instrument) =>
+            ["GC=F", "SI=F"].includes(
+                instrument.symbol
+            )
     );
 
-    const globalMarkets = market.instruments.filter((instrument) =>
-        ["^GSPC", "^IXIC", "^DJI"].includes(
-            instrument.symbol
-        )
+    const globalMarkets = market.instruments.filter(
+        (instrument) =>
+            ["^GSPC", "^IXIC", "^DJI"].includes(
+                instrument.symbol
+            )
+    );
+
+    const indianNews = news.filter(
+        (article) =>
+            article.category === "Indian Markets"
+    );
+
+    const globalNews = news.filter(
+        (article) =>
+            article.category === "Global Markets"
+    );
+
+    const commodityNews = news.filter(
+        (article) =>
+            article.category === "Commodities"
     );
 
     function MarketCard({ instrument }) {
@@ -194,6 +232,83 @@ function Market() {
         );
     }
 
+    function NewsCard({ article }) {
+        const publishedDate = article.published_at
+            ? new Date(
+                  article.published_at
+              ).toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+              })
+            : null;
+
+        return (
+            <a
+                className="market-news-card"
+                href={article.url}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <div className="market-news-card-top">
+                    <span className="market-news-source">
+                        {article.source || "Unknown source"}
+                    </span>
+
+                    <ExternalLink
+                        size={14}
+                        strokeWidth={2}
+                    />
+                </div>
+
+                <h3>{article.title}</h3>
+
+                {article.description && (
+                    <p>
+                        {article.description}
+                    </p>
+                )}
+
+                <div className="market-news-card-footer">
+                    <span>
+                        {publishedDate || "Date unavailable"}
+                    </span>
+                </div>
+            </a>
+        );
+    }
+
+    function NewsSection({
+        title,
+        description,
+        articles,
+    }) {
+        if (articles.length === 0) {
+            return null;
+        }
+
+        return (
+            <section className="market-news-section">
+                <div className="market-section-heading">
+                    <div>
+                        <h2>{title}</h2>
+
+                        <p>{description}</p>
+                    </div>
+                </div>
+
+                <div className="market-news-grid">
+                    {articles.map((article, index) => (
+                        <NewsCard
+                            key={`${article.url}-${index}`}
+                            article={article}
+                        />
+                    ))}
+                </div>
+            </section>
+        );
+    }
+
     return (
         <>
             <section className="page-header market-page-header">
@@ -252,12 +367,49 @@ function Market() {
                 instruments={globalMarkets}
             />
 
+            <section className="market-news-container">
+                <div className="market-news-header">
+                    <div>
+                        <p className="eyebrow">
+                            MARKET INTELLIGENCE
+                        </p>
+
+                        <h2>Latest market news.</h2>
+
+                        <p>
+                            Recent developments across Indian
+                            markets, global markets, and
+                            commodities.
+                        </p>
+                    </div>
+                </div>
+
+                <NewsSection
+                    title="Indian Markets"
+                    description="Recent developments in the Indian equity market."
+                    articles={indianNews}
+                />
+
+                <NewsSection
+                    title="Global Markets"
+                    description="Major developments across international markets."
+                    articles={globalNews}
+                />
+
+                <NewsSection
+                    title="Commodities"
+                    description="Recent developments in gold and silver markets."
+                    articles={commodityNews}
+                />
+            </section>
+
             <div className="market-data-note">
                 <span className="market-note-dot" />
 
                 <span>
-                    Market data is sourced from yfinance and may
-                    be delayed.
+                    Market data is sourced from yfinance and
+                    may be delayed. News is retrieved from
+                    external market-news sources.
                 </span>
             </div>
         </>

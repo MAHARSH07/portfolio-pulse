@@ -18,5 +18,18 @@ class MarketInstrument(BaseModel):
     timestamp: datetime
 
 
+class MarketNewsArticle(BaseModel):
+    title: str
+    url: str
+    description: str | None = None
+    published_at: datetime | None = None
+    source: str | None = None
+    category: str
+
+
+class MarketNewsResponse(BaseModel):
+    articles: list[MarketNewsArticle]
+
+
 class MarketOverview(BaseModel):
     instruments: list[MarketInstrument]
