@@ -1,25 +1,34 @@
 from app.ai.agent import get_agent
 
 
-def main():
-    agent = get_agent()
+agent = get_agent()
 
-    result = agent.invoke(
-        {
-            "messages": [
-                {
-                    "role": "user",
-                    "content": "What's the latest news about KPIT Technologies?",
-                }
-            ]
-        }
-    )
+result = agent.invoke(
+    {
+        "messages": [
+            {
+                "role": "user",
+                "content": (
+                    "What is the latest news about KPIT Technologies "
+                    "and how might it affect my holding?"
+                ),
+            }
+        ]
+    }
+)
 
-    final_message = result["messages"][-1]
+print("\nMessages:\n")
 
-    print("Agent response:")
-    print(final_message.content)
+for message in result["messages"]:
+    print(f"Type: {type(message).__name__}")
+    print(f"Content: {message.content}")
+    print(f"Additional kwargs: {message.additional_kwargs}")
+    print(f"Response metadata: {message.response_metadata}")
 
+    if getattr(message, "tool_calls", None):
+        print("Tool calls:")
+        for tool_call in message.tool_calls:
+            print(f"  Tool: {tool_call['name']}")
+            print(f"  Arguments: {tool_call['args']}")
 
-if __name__ == "__main__":
-    main()
+    print("\n---\n")
