@@ -1,15 +1,17 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
-from app.db.database import engine
 
-from app.routers.portfolio import router as portfolio_router
-from app.routers.transaction import router as transaction_router
-from app.routers.sync import router as sync_router
-from app.routers.groww import router as groww_router
+from app.db.database import engine
 from app.routers.ai import router as ai_router
+from app.routers.groww import router as groww_router
 from app.routers.market import router as market_router
+from app.routers.market_events import router as market_events_router
 from app.routers.market_news import router as market_news_router
+from app.routers.portfolio import router as portfolio_router
+from app.routers.sync import router as sync_router
+from app.routers.transaction import router as transaction_router
+
 
 app = FastAPI(
     title="PortfolioPulse API",
@@ -37,6 +39,7 @@ app.include_router(groww_router)
 app.include_router(ai_router)
 app.include_router(market_router)
 app.include_router(market_news_router)
+app.include_router(market_events_router)
 
 
 @app.get("/")
@@ -52,6 +55,7 @@ def health_check():
     return {
         "status": "healthy"
     }
+
 
 @app.get("/db-health")
 def database_health_check():

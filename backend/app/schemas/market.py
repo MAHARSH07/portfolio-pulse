@@ -31,5 +31,21 @@ class MarketNewsResponse(BaseModel):
     articles: list[MarketNewsArticle]
 
 
+class MarketEconomicEvent(BaseModel):
+    title: str
+    country: str
+    category: str
+    event_date: datetime
+    end_date: datetime | None = None
+    description: str | None = None
+    source: str | None = None
+    url: str
+    status: str
+
+
+class MarketEconomicEventsResponse(BaseModel):
+    events: list[MarketEconomicEvent]
+
+
 class MarketOverview(BaseModel):
     instruments: list[MarketInstrument]
