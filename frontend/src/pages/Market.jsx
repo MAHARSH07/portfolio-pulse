@@ -9,6 +9,7 @@ import {
 function Market() {
     const [market, setMarket] = useState(null);
     const [news, setNews] = useState([]);
+    const [events, setEvents] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -24,11 +25,15 @@ function Market() {
 
             setError("");
 
-            const [marketResponse, newsResponse] =
-                await Promise.all([
-                    fetch("http://127.0.0.1:8000/market"),
-                    fetch("http://127.0.0.1:8000/market/news"),
-                ]);
+            const [
+                marketResponse,
+                newsResponse,
+                eventsResponse,
+            ] = await Promise.all([
+                fetch("http://127.0.0.1:8000/market"),
+                fetch("http://127.0.0.1:8000/market/news"),
+                fetch("http://127.0.0.1:8000/market/events"),
+            ]);
 
             if (!marketResponse.ok) {
                 throw new Error(
@@ -42,14 +47,24 @@ function Market() {
                 );
             }
 
+            if (!eventsResponse.ok) {
+                throw new Error(
+                    "Unable to load economic events."
+                );
+            }
+
             const marketData =
                 await marketResponse.json();
 
             const newsData =
                 await newsResponse.json();
 
+            const eventsData =
+                await eventsResponse.json();
+
             setMarket(marketData);
             setNews(newsData.articles ?? []);
+            setEvents(eventsData.events ?? []);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -309,6 +324,117 @@ function Market() {
         );
     }
 
+    function EconomicEventCard({ event }) {
+        const startDate = new Date(
+            event.event_date
+        ).toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        });
+
+        const endDate = event.end_date
+            ? new Date(
+                  event.end_date
+              ).toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+              })
+            : null;
+
+        const eventDate = endDate
+            ? `${startDate} – ${endDate}`
+            : startDate;
+
+        return (
+            <article className="market-event-card">
+                <div className="market-event-card-top">
+                    <span className="market-event-category">
+                        {event.category}
+                    </span>
+
+                    <span
+                        className={`market-event-status ${event.status}`}
+                    >
+                        {event.status}
+                    </span>
+                </div>
+
+                <h3>{event.title}</h3>
+
+                <div className="market-event-date">
+                    {eventDate}
+                </div>
+
+                <p className="market-event-country">
+                    {event.country}
+                </p>
+
+                {event.description && (
+                    <p className="market-event-description">
+                        {event.description}
+                    </p>
+                )}
+
+                <div className="market-event-footer">
+                    <span>
+                        {event.source || "Unknown source"}
+                    </span>
+
+                    <a
+                        href={event.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Open source for ${event.title}`}
+                    >
+                        <ExternalLink
+                            size={13}
+                            strokeWidth={2}
+                        />
+                    </a>
+                </div>
+            </article>
+        );
+    }
+
+    function EconomicEventsSection() {
+        if (events.length === 0) {
+            return null;
+        }
+
+        return (
+            <section className="market-events-container">
+                <div className="market-events-header">
+                    <div>
+                        <p className="eyebrow">
+                            MACRO CALENDAR
+                        </p>
+
+                        <h2>
+                            Economic & macro events.
+                        </h2>
+
+                        <p>
+                            Scheduled events that can influence
+                            markets, rates, currencies, and
+                            commodities.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="market-events-grid">
+                    {events.map((event, index) => (
+                        <EconomicEventCard
+                            key={`${event.title}-${event.event_date}-${index}`}
+                            event={event}
+                        />
+                    ))}
+                </div>
+            </section>
+        );
+    }
+
     return (
         <>
             <section className="page-header market-page-header">
@@ -367,6 +493,8 @@ function Market() {
                 instruments={globalMarkets}
             />
 
+            <EconomicEventsSection />
+
             <section className="market-news-container">
                 <div className="market-news-header">
                     <div>
@@ -374,7 +502,9 @@ function Market() {
                             MARKET INTELLIGENCE
                         </p>
 
-                        <h2>Latest market news.</h2>
+                        <h2>
+                            Latest market news.
+                        </h2>
 
                         <p>
                             Recent developments across Indian
@@ -408,8 +538,8 @@ function Market() {
 
                 <span>
                     Market data is sourced from yfinance and
-                    may be delayed. News is retrieved from
-                    external market-news sources.
+                    may be delayed. News and economic events
+                    are retrieved from external sources.
                 </span>
             </div>
         </>

@@ -2559,3 +2559,220 @@
         padding: 16px;
     }
 }
+
+
+/* ========================================
+   MARKET ECONOMIC EVENTS
+======================================== */
+
+.market-events-container {
+    margin-top: 42px;
+    margin-bottom: 10px;
+}
+
+.market-events-header {
+    margin-bottom: 30px;
+}
+
+.market-events-header h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 22px;
+    font-weight: 650;
+    letter-spacing: -0.025em;
+}
+
+.market-events-header p:last-child {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.market-events-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.market-event-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 250px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.028),
+            rgba(255, 255, 255, 0.008)
+        ),
+        var(--bg-surface);
+    box-shadow: var(--shadow-sm);
+    transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        background 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.market-event-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.045),
+            rgba(255, 255, 255, 0.012)
+        ),
+        var(--bg-surface-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.market-event-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.market-event-category {
+    overflow: hidden;
+    color: var(--accent);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.market-event-status {
+    flex: 0 0 auto;
+    padding: 5px 8px;
+    border-radius: 7px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.market-event-status.upcoming {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.market-event-status.ongoing {
+    background: var(--positive-soft);
+    color: var(--positive);
+}
+
+.market-event-status.past {
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--text-muted);
+}
+
+.market-event-card h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+    line-height: 1.45;
+}
+
+.market-event-date {
+    margin-top: 12px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+}
+
+.market-event-country {
+    margin: 4px 0 0;
+    color: var(--text-muted);
+    font-size: 10px;
+}
+
+.market-event-description {
+    display: -webkit-box;
+    margin: 13px 0 0;
+    overflow: hidden;
+    color: var(--text-secondary);
+    font-size: 11px;
+    line-height: 1.6;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+.market-event-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 10px;
+}
+
+.market-event-footer a {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition:
+        background 160ms ease,
+        color 160ms ease;
+}
+
+.market-event-footer a:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.market-event-footer a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   MARKET EVENTS RESPONSIVE
+======================================== */
+
+@media (max-width: 850px) {
+    .market-events-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .market-events-container {
+        margin-top: 34px;
+    }
+
+    .market-events-header {
+        margin-bottom: 24px;
+    }
+
+    .market-events-header h2 {
+        font-size: 19px;
+    }
+
+    .market-events-grid {
+        gap: 10px;
+    }
+
+    .market-event-card {
+        min-height: 220px;
+        padding: 16px;
+    }
+}

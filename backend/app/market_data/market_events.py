@@ -8,19 +8,60 @@ from app.web.service import WebSearchService
 
 ECONOMIC_EVENT_QUERIES = [
     {
-        "query": "upcoming India economic events RBI MPC CPI GDP October 2026",
+        "query": (
+            "RBI MPC October 2026 meeting scheduled dates "
+            "October 5 7 2026"
+        ),
         "country": "India",
         "category": "Indian Economy",
     },
     {
-        "query": "upcoming US economic events Federal Reserve CPI jobs GDP October 2026",
+        "query": (
+            "India CPI inflation release October 2026 "
+            "scheduled date"
+        ),
+        "country": "India",
+        "category": "Indian Economy",
+    },
+    {
+        "query": (
+            "India GDP release October November 2026 "
+            "scheduled date"
+        ),
+        "country": "India",
+        "category": "Indian Economy",
+    },
+    {
+        "query": (
+            "Federal Reserve FOMC meeting October 2026 "
+            "scheduled date"
+        ),
         "country": "United States",
         "category": "US Economy",
     },
     {
-        "query": "upcoming global economic events central bank inflation GDP October 2026",
-        "country": "Global",
-        "category": "Global Economy",
+        "query": (
+            "US CPI inflation October 2026 "
+            "release date scheduled"
+        ),
+        "country": "United States",
+        "category": "US Economy",
+    },
+    {
+        "query": (
+            "US jobs employment report October 2026 "
+            "release date scheduled"
+        ),
+        "country": "United States",
+        "category": "US Economy",
+    },
+    {
+        "query": (
+            "US GDP release October November 2026 "
+            "scheduled date"
+        ),
+        "country": "United States",
+        "category": "US Economy",
     },
 ]
 
@@ -35,6 +76,9 @@ PREFERRED_SOURCES = {
     "cnbc.com": 4,
     "federalreserve.gov": 5,
     "rbi.org.in": 5,
+    "bls.gov": 5,
+    "bea.gov": 5,
+    "mospi.gov.in": 5,
 }
 
 
@@ -58,7 +102,10 @@ def _source_score(source: str | None) -> int:
     if not source:
         return 0
 
-    return PREFERRED_SOURCES.get(source.lower(), 0)
+    return PREFERRED_SOURCES.get(
+        source.lower(),
+        0,
+    )
 
 
 def _freshness_score(
@@ -93,12 +140,16 @@ def _parse_date(
     day: str,
     year: str | None,
 ) -> datetime | None:
-    month_number = MONTHS.get(month.lower())
+    month_number = MONTHS.get(
+        month.lower()
+    )
 
     if month_number is None:
         return None
 
-    current_year = datetime.now(timezone.utc).year
+    current_year = datetime.now(
+        timezone.utc
+    ).year
 
     try:
         parsed_year = (
@@ -120,7 +171,10 @@ def _parse_date(
 
 def _extract_event_dates(
     text: str,
-) -> tuple[datetime | None, datetime | None]:
+) -> tuple[
+    datetime | None,
+    datetime | None,
+]:
 
     if not text:
         return None, None
@@ -131,10 +185,17 @@ def _extract_event_dates(
         text,
     )
 
+    # Examples:
+    #
+    # scheduled for October 5 to 7
+    # scheduled to be held from October 5 to 7
+    # scheduled from October 5 to October 7
     range_match = re.search(
-        r"(?:scheduled\s+to\s+be\s+held\s+)?"
-        r"(?:scheduled\s+)?"
-        r"(?:from\s+)?"
+        r"(?:"
+        r"scheduled\s+to\s+be\s+held"
+        r"|scheduled"
+        r")?"
+        r"\s*(?:from\s+)?"
         r"(January|February|March|April|May|June|July|August|"
         r"September|October|November|December)"
         r"\s+(\d{1,2})"
@@ -176,12 +237,22 @@ def _extract_event_dates(
         if start_date and end_date:
             return start_date, end_date
 
+    # Examples:
+    #
+    # scheduled for October 8
+    # scheduled on October 8
+    # will meet on October 28
+    # release is scheduled for October 14
+    # due on October 14
+    # expected on October 14
     single_match = re.search(
         r"(?:"
         r"scheduled\s+(?:for|on)"
         r"|will\s+(?:meet|occur)\s+on"
         r"|meeting\s+(?:is\s+)?on"
         r"|release\s+is\s+scheduled\s+(?:for|on)"
+        r"|release\s+date\s+is\s+"
+        r"(?:scheduled\s+)?(?:for|on)"
         r"|due\s+on"
         r"|expected\s+on"
         r")\s+"
@@ -216,73 +287,91 @@ def _detect_event_title(
         text,
     )
 
+    # -------------------------
+    # India
+    # -------------------------
+
     if re.search(
-        r"\bRBI\b.{0,80}\bMPC\b|\bMPC\b.{0,80}\bRBI\b",
+        r"\bRBI\b.{0,100}\bMPC\b"
+        r"|\bMPC\b.{0,100}\bRBI\b",
         normalized,
         re.IGNORECASE,
     ):
-        return "RBI Monetary Policy Committee Meeting"
+        return (
+            "RBI Monetary Policy Committee Meeting"
+        )
 
     if re.search(
-        r"\bRBI\b.{0,80}(?:policy meeting|monetary policy)",
+        r"\bRBI\b.{0,100}"
+        r"(?:policy meeting|monetary policy)",
         normalized,
         re.IGNORECASE,
     ):
         return "RBI Monetary Policy Meeting"
 
     if re.search(
-        r"\bIndia\b.{0,60}\bCPI\b|\bCPI\b.{0,60}\bIndia\b",
+        r"\bIndia\b.{0,80}\bCPI\b"
+        r"|\bCPI\b.{0,80}\bIndia\b",
         normalized,
         re.IGNORECASE,
     ):
         return "India CPI Inflation Release"
 
     if re.search(
-        r"\bIndia\b.{0,60}\bGDP\b|\bGDP\b.{0,60}\bIndia\b",
+        r"\bIndia\b.{0,80}\bGDP\b"
+        r"|\bGDP\b.{0,80}\bIndia\b",
         normalized,
         re.IGNORECASE,
     ):
         return "India GDP Release"
 
+    # -------------------------
+    # United States
+    # -------------------------
+
     if re.search(
-        r"\bFed\b|\bFederal Reserve\b|\bFOMC\b",
+        r"\bFed\b"
+        r"|\bFederal Reserve\b"
+        r"|\bFOMC\b",
         normalized,
         re.IGNORECASE,
     ):
-        return "US Federal Reserve / FOMC Meeting"
+        return (
+            "US Federal Reserve / FOMC Meeting"
+        )
 
     if re.search(
-        r"\bUS\b.{0,60}\bCPI\b|\bCPI\b.{0,60}\bUS\b",
+        r"\bUS\b.{0,80}\bCPI\b"
+        r"|\bCPI\b.{0,80}\bUS\b",
         normalized,
         re.IGNORECASE,
     ):
         return "US CPI Inflation Release"
 
     if re.search(
-        r"\bUS\b.{0,60}(?:jobs report|employment report|nonfarm payrolls)",
+        r"\bUS\b.{0,100}"
+        r"(?:jobs report|employment report|"
+        r"nonfarm payrolls)",
         normalized,
         re.IGNORECASE,
     ):
         return "US Employment Report"
 
     if re.search(
-        r"\bUS\b.{0,60}\bGDP\b|\bGDP\b.{0,60}\bUS\b",
+        r"\bUS\b.{0,80}\bGDP\b"
+        r"|\bGDP\b.{0,80}\bUS\b",
         normalized,
         re.IGNORECASE,
     ):
         return "US GDP Release"
 
-    if re.search(
-        r"\bcentral bank\b.{0,80}(?:meeting|policy|rate)",
-        normalized,
-        re.IGNORECASE,
-    ):
-        return "Central Bank Policy Event"
-
     return None
 
 
-def _event_identity(title: str) -> str:
+def _event_identity(
+    title: str,
+) -> str:
+
     normalized = title.lower()
 
     normalized = re.sub(
@@ -310,18 +399,24 @@ def _rank_results(
     results: list[WebSearchResult],
 ) -> list[WebSearchResult]:
 
-    def score(result: WebSearchResult) -> int:
-        score = 0
+    def score(
+        result: WebSearchResult,
+    ) -> int:
 
-        score += _source_score(result.source)
-        score += _freshness_score(
+        value = 0
+
+        value += _source_score(
+            result.source
+        )
+
+        value += _freshness_score(
             result.published_at
         )
 
         if result.published_at is not None:
-            score += 2
+            value += 2
 
-        return score
+        return value
 
     return sorted(
         results,
@@ -345,27 +440,33 @@ def _build_event(
         if value
     )
 
-    event_title = _detect_event_title(text)
+    event_title = _detect_event_title(
+        text
+    )
 
     if event_title is None:
         return None
 
-    event_date, end_date = _extract_event_dates(
-        text
+    event_date, end_date = (
+        _extract_event_dates(text)
     )
 
     if event_date is None:
         return None
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(
+        timezone.utc
+    )
 
     if end_date and end_date < now:
         status = "past"
+
     elif event_date <= now and (
         end_date is None
         or now <= end_date
     ):
         status = "ongoing"
+
     else:
         status = "upcoming"
 
@@ -403,7 +504,9 @@ def _deduplicate_events(
             event["event_date"],
         )
 
-        existing = unique_events.get(key)
+        existing = unique_events.get(
+            key
+        )
 
         if existing is None:
             unique_events[key] = event
@@ -422,47 +525,84 @@ def _deduplicate_events(
 
     return sorted(
         unique_events.values(),
-        key=lambda event: event["event_date"],
+        key=lambda event: event[
+            "event_date"
+        ],
     )
 
 
 class MarketEconomicEventsProvider:
 
     def __init__(self):
-        provider = get_web_search_provider()
+        provider = (
+            get_web_search_provider()
+        )
 
-        self.search_service = WebSearchService(
-            provider
+        self.search_service = (
+            WebSearchService(provider)
         )
 
     def get_upcoming_events(
         self,
-        days: int = 30,
+        days: int = 60,
     ) -> list[dict]:
 
         events = []
 
-        for event_query in ECONOMIC_EVENT_QUERIES:
+        for event_query in (
+            ECONOMIC_EVENT_QUERIES
+        ):
 
-            search_result = self.search_service.search(
-                query=event_query["query"],
-                topic="news",
-                days=days,
+            search_result = (
+                self.search_service.search(
+                    query=event_query["query"],
+                    topic="news",
+                    days=days,
+                )
             )
 
-            ranked_results = _rank_results(
-                search_result.results
+            ranked_results = (
+                _rank_results(
+                    search_result.results
+                )
             )
 
             for result in ranked_results:
 
                 event = _build_event(
                     result=result,
-                    country=event_query["country"],
-                    category=event_query["category"],
+                    country=event_query[
+                        "country"
+                    ],
+                    category=event_query[
+                        "category"
+                    ],
                 )
 
                 if event is not None:
                     events.append(event)
 
-        return _deduplicate_events(events)
+        deduplicated = (
+            _deduplicate_events(events)
+        )
+
+        # The endpoint is an upcoming/ongoing
+        # calendar, so don't return events that
+        # have already completely finished.
+        now = datetime.now(
+            timezone.utc
+        )
+
+        return [
+            event
+            for event in deduplicated
+            if (
+                event["end_date"] is None
+                and event["event_date"] >= now
+            )
+            or (
+                event["end_date"] is not None
+                and event["end_date"] >= now
+            )
+            or event["status"] == "ongoing"
+        ]
