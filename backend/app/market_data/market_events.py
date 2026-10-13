@@ -4,6 +4,7 @@ from app.market_data.event_sources.bea import BEAEventSource
 from app.market_data.event_sources.fed import FedEventSource
 from app.market_data.event_sources.importance import (
     classify_event_importance,
+    get_event_market_impact,
 )
 from app.market_data.event_sources.mospi import MoSPIEventSource
 from app.market_data.event_sources.rbi import RBIEventSource
@@ -37,6 +38,10 @@ class MarketEconomicEventsProvider:
 
                 event_data["importance"] = (
                     classify_event_importance(event)
+                )
+
+                event_data["market_impact"] = (
+                    get_event_market_impact(event)
                 )
 
                 events.append(event_data)

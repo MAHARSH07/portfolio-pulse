@@ -46,6 +46,7 @@ class MarketEconomicEvent(BaseModel):
     url: str
     status: str
     importance: EventImportance = "medium"
+    market_impact: str | None = None
 
 
 class MarketEconomicEventsResponse(BaseModel):
