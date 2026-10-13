@@ -1,9 +1,13 @@
 from datetime import datetime
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel
 
 from app.market_data.price import PriceStatus
+
+
+EventImportance = Literal["high", "medium", "low"]
 
 
 class MarketInstrument(BaseModel):
@@ -41,6 +45,7 @@ class MarketEconomicEvent(BaseModel):
     source: str | None = None
     url: str
     status: str
+    importance: EventImportance = "medium"
 
 
 class MarketEconomicEventsResponse(BaseModel):

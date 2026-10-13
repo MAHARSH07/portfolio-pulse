@@ -1,7 +1,10 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from app.market_data.event_sources.bea import BEAEventSource
 from app.market_data.event_sources.fed import FedEventSource
+from app.market_data.event_sources.importance import (
+    classify_event_importance,
+)
 from app.market_data.event_sources.mospi import MoSPIEventSource
 from app.market_data.event_sources.rbi import RBIEventSource
 
@@ -22,6 +25,7 @@ class MarketEconomicEventsProvider:
     ) -> list[dict]:
 
         now = datetime.now(timezone.utc)
+        cutoff_date = now + timedelta(days=days)
 
         events = []
 
@@ -29,19 +33,17 @@ class MarketEconomicEventsProvider:
             source_events = source.get_events()
 
             for event in source_events:
-                events.append(
-                    event.model_dump()
+                event_data = event.model_dump()
+
+                event_data["importance"] = (
+                    classify_event_importance(event)
                 )
 
-        events = self._deduplicate_events(
-            events
-        )
+                events.append(event_data)
 
-        from datetime import timedelta
+        events = self._deduplicate_events(events)
 
         upcoming_events = []
-
-        cutoff_date = now + timedelta(days=days)
 
         for event in events:
             event_date = event["event_date"]
@@ -53,11 +55,11 @@ class MarketEconomicEventsProvider:
                 else event_date
             )
 
-            # Completely finished events
+            # Exclude events that have completely finished.
             if effective_end_date < now:
                 continue
 
-            # Events starting beyond the requested window
+            # Exclude events starting beyond the requested window.
             if event_date > cutoff_date:
                 continue
 
@@ -77,7 +79,6 @@ class MarketEconomicEventsProvider:
         unique_events = {}
 
         for event in events:
-
             identity = (
                 event["title"]
                 .strip()
@@ -90,30 +91,18 @@ class MarketEconomicEventsProvider:
                 event["event_date"],
             )
 
-            existing = unique_events.get(
-                key
-            )
+            existing = unique_events.get(key)
 
             if existing is None:
                 unique_events[key] = event
                 continue
 
-            # Prefer the event that has a
-            # description and a more specific URL.
-            existing_description = (
-                existing.get("description")
-            )
+            # Prefer the duplicate containing a description
+            # when the existing event has none.
+            existing_description = existing.get("description")
+            new_description = event.get("description")
 
-            new_description = (
-                event.get("description")
-            )
-
-            if (
-                not existing_description
-                and new_description
-            ):
+            if not existing_description and new_description:
                 unique_events[key] = event
 
-        return list(
-            unique_events.values()
-        )
+        return list(unique_events.values())
