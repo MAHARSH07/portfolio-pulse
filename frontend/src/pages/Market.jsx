@@ -262,6 +262,26 @@ function Market() {
       ? event.importance
       : "medium";
 
+    const portfolioRelevance = event.portfolio_relevance;
+    const relevantHoldings = portfolioRelevance?.holdings ?? [];
+    const unmatchedHoldings = portfolioRelevance?.unmatched_holdings ?? [];
+
+    function formatExposure(value) {
+      return value
+        .replaceAll("_", " ")
+        .replace(/\b\w/g, (character) => character.toUpperCase());
+    }
+
+    function formatRelevance(value) {
+      const labels = {
+        potential_sector_exposure: "Sector exposure",
+        potential_commodity_exposure: "Commodity exposure",
+        potential_broad_market_exposure: "Broad-market exposure",
+      };
+
+      return labels[value] || formatExposure(value);
+    }
+
     return (
       <article className="market-event-card">
         <div className="market-event-card-top">
@@ -302,6 +322,57 @@ function Market() {
             </div>
 
             <p>{event.market_impact}</p>
+          </div>
+        )}
+
+        {portfolioRelevance && (
+          <div className="market-event-portfolio">
+            <div className="market-event-portfolio-heading">
+              <h4>Potential Portfolio Relevance</h4>
+              <span>{relevantHoldings.length} matched</span>
+            </div>
+
+            {portfolioRelevance.explanation && (
+              <p className="market-event-portfolio-explanation">
+                {portfolioRelevance.explanation}
+              </p>
+            )}
+
+            {relevantHoldings.length > 0 ? (
+              <ul className="market-event-holdings">
+                {relevantHoldings.map((holding) => (
+                  <li key={holding.symbol}>
+                    <div>
+                      <strong>{holding.symbol}</strong>
+                      <span>{holding.company_name}</span>
+                    </div>
+
+                    <div className="market-event-holding-tags">
+                      {holding.sector && (
+                        <span className="market-event-exposure">
+                          {formatExposure(holding.sector)}
+                        </span>
+                      )}
+
+                      <span className="market-event-relevance-type">
+                        {formatRelevance(holding.relevance)}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="market-event-no-holdings">
+                No mapped holdings matched this event.
+              </p>
+            )}
+
+            {unmatchedHoldings.length > 0 && (
+              <p className="market-event-unmatched">
+                {unmatchedHoldings.length} holding(s) could not be matched
+                because their exposure is not mapped yet.
+              </p>
+            )}
           </div>
         )}
 

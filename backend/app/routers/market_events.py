@@ -1,12 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-from app.schemas.market import (
-    MarketEconomicEventsResponse,
-)
-from app.services.market_events_service import (
-    get_market_events,
-)
-
+from app.db.database import get_db
+from app.schemas.market import MarketEconomicEventsResponse
+from app.services.market_events_service import get_market_events
 
 router = APIRouter(
     prefix="/market/events",
@@ -18,5 +15,7 @@ router = APIRouter(
     "",
     response_model=MarketEconomicEventsResponse,
 )
-def read_market_events() -> MarketEconomicEventsResponse:
-    return get_market_events()
+def read_market_events(
+    db: Session = Depends(get_db),
+) -> MarketEconomicEventsResponse:
+    return get_market_events(db)

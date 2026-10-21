@@ -47,6 +47,7 @@ class MarketEconomicEvent(BaseModel):
     status: str
     importance: EventImportance = "medium"
     market_impact: str | None = None
+    portfolio_relevance: dict | None = None
 
 
 class MarketEconomicEventsResponse(BaseModel):
