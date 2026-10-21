@@ -3032,3 +3032,11 @@
 .market-event-portfolio-details {
   margin-top: 12px;
 }
+
+
+.market-event-holding-explanation {
+  margin: 8px 0 0;
+  color: var(--text-secondary, #6b7280);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}

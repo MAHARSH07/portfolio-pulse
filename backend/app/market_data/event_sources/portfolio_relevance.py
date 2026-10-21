@@ -148,6 +148,113 @@ EVENT_SECTOR_RULES = [
 ]
 
 
+def get_holding_explanation(
+    rule_ids: set[str],
+    exposure: str,
+) -> str:
+    """Explain the potential connection for an individual holding."""
+
+    if exposure == "gold":
+        return (
+            "Gold prices can respond to interest-rate expectations, "
+            "currency movements, and investor demand for safe-haven "
+            "assets. The actual effect depends on market conditions."
+        )
+
+    if exposure == "silver":
+        return (
+            "Silver can respond to precious-metal demand, currency "
+            "movements, and industrial demand. The effect depends "
+            "on the event and broader market conditions."
+        )
+
+    if exposure == "banking":
+        if "rbi_policy" in rule_ids:
+            return (
+                "RBI policy decisions can influence Indian interest "
+                "rates, bank funding costs, lending conditions, and "
+                "credit demand. The net effect on banking stocks "
+                "is not necessarily positive or negative."
+            )
+
+        return (
+            "This banking exposure may be affected indirectly by "
+            "interest-rate expectations, liquidity, and investor "
+            "flows. The effect depends on the event and market context."
+        )
+
+    if exposure == "financial_services":
+        return (
+            "Financial-services businesses may be affected by "
+            "interest rates, liquidity, borrowing conditions, and "
+            "investor activity. The impact varies by business model."
+        )
+
+    if exposure == "technology":
+        return (
+            "Technology-sector sentiment can respond to global "
+            "growth expectations, currency movements, and changes "
+            "in investor risk appetite. Company-specific factors "
+            "can lead to different outcomes."
+        )
+
+    if exposure == "exporters":
+        return (
+            "Export-oriented businesses may be affected by overseas "
+            "demand, trade conditions, and currency movements. The "
+            "impact depends on their markets and business mix."
+        )
+
+    if exposure == "manufacturing":
+        return (
+            "Manufacturing businesses may be affected by demand "
+            "conditions, input costs, trade activity, and economic "
+            "growth expectations."
+        )
+
+    if exposure == "industrials":
+        return (
+            "Industrial businesses can be sensitive to economic "
+            "activity, trade flows, and investment demand. The "
+            "actual impact varies across companies."
+        )
+
+    if exposure == "energy":
+        return (
+            "Energy-sector performance may respond to economic "
+            "activity, energy demand, and commodity-market conditions."
+        )
+
+    if exposure == "consumer":
+        return (
+            "Consumer-facing businesses may be affected by household "
+            "income, spending patterns, and inflation."
+        )
+
+    if exposure == "retail":
+        return (
+            "Retail businesses may be affected by consumer spending, "
+            "purchasing power, and changes in household demand."
+        )
+
+    if exposure in {"broad_market_equity", "midcap_equity"}:
+        market_type = (
+            "Mid-cap equities"
+            if exposure == "midcap_equity"
+            else "Broad-market equities"
+        )
+        return (
+            f"{market_type} may respond to changes in economic-growth "
+            "expectations, interest rates, and investor sentiment. "
+            "The effect depends on the event and market conditions."
+        )
+
+    return (
+        "This holding matches a broad exposure category for the event. "
+        "Its specific sensitivity has not been established."
+    )
+
+
 def get_portfolio_event_relevance(
     event: MarketEconomicEvent,
     holdings: list[dict],
@@ -203,6 +310,9 @@ def get_portfolio_event_relevance(
 
     matched_holdings = []
     unmatched_holdings = []
+    matched_rule_ids = {
+        rule["id"] for rule in matched_rules
+    }
 
     for holding in holdings:
         symbol = str(holding.get("symbol", "")).strip().upper()
@@ -235,6 +345,10 @@ def get_portfolio_event_relevance(
         matched_holdings.append({
             **holding_data,
             "relevance": relevance,
+            "holding_explanation": get_holding_explanation(
+                matched_rule_ids,
+                exposure,
+            ),
         })
 
     if is_regional_gdp:

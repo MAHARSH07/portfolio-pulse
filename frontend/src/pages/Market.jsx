@@ -380,6 +380,12 @@ function Market() {
                             {formatRelevance(holding.relevance)}
                           </span>
                         </div>
+
+                        {holding.holding_explanation && (
+                          <p className="market-event-holding-explanation">
+                            {holding.holding_explanation}
+                          </p>
+                        )}
                       </li>
                     ))}
                   </ul>
