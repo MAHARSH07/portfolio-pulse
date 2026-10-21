@@ -242,6 +242,8 @@ function Market() {
   }
 
   function EconomicEventCard({ event }) {
+    const [portfolioExpanded, setPortfolioExpanded] = useState(false);
+
     const startDate = new Date(event.event_date).toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
@@ -327,51 +329,73 @@ function Market() {
 
         {portfolioRelevance && (
           <div className="market-event-portfolio">
-            <div className="market-event-portfolio-heading">
-              <h4>Potential Portfolio Relevance</h4>
-              <span>{relevantHoldings.length} matched</span>
-            </div>
+            <button
+              type="button"
+              className="market-event-portfolio-toggle"
+              onClick={() => setPortfolioExpanded((expanded) => !expanded)}
+              aria-expanded={portfolioExpanded}
+            >
+              <span className="market-event-portfolio-toggle-text">
+                <strong>Potential Portfolio Relevance</strong>
+                <span>
+                  {relevantHoldings.length} matched holding
+                  {relevantHoldings.length === 1 ? "" : "s"}
+                  {unmatchedHoldings.length > 0
+                    ? ` · ${unmatchedHoldings.length} unmapped`
+                    : ""}
+                </span>
+              </span>
 
-            {portfolioRelevance.explanation && (
-              <p className="market-event-portfolio-explanation">
-                {portfolioRelevance.explanation}
-              </p>
-            )}
+              <span className="market-event-portfolio-toggle-action">
+                {portfolioExpanded ? "Hide details" : "View details"}
+                <span aria-hidden="true">{portfolioExpanded ? "−" : "+"}</span>
+              </span>
+            </button>
 
-            {relevantHoldings.length > 0 ? (
-              <ul className="market-event-holdings">
-                {relevantHoldings.map((holding) => (
-                  <li key={holding.symbol}>
-                    <div>
-                      <strong>{holding.symbol}</strong>
-                      <span>{holding.company_name}</span>
-                    </div>
+            {portfolioExpanded && (
+              <div className="market-event-portfolio-details">
+                {portfolioRelevance.explanation && (
+                  <p className="market-event-portfolio-explanation">
+                    {portfolioRelevance.explanation}
+                  </p>
+                )}
 
-                    <div className="market-event-holding-tags">
-                      {holding.sector && (
-                        <span className="market-event-exposure">
-                          {formatExposure(holding.sector)}
-                        </span>
-                      )}
+                {relevantHoldings.length > 0 ? (
+                  <ul className="market-event-holdings">
+                    {relevantHoldings.map((holding) => (
+                      <li key={holding.symbol}>
+                        <div>
+                          <strong>{holding.symbol}</strong>
+                          <span>{holding.company_name}</span>
+                        </div>
 
-                      <span className="market-event-relevance-type">
-                        {formatRelevance(holding.relevance)}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="market-event-no-holdings">
-                No mapped holdings matched this event.
-              </p>
-            )}
+                        <div className="market-event-holding-tags">
+                          {holding.sector && (
+                            <span className="market-event-exposure">
+                              {formatExposure(holding.sector)}
+                            </span>
+                          )}
 
-            {unmatchedHoldings.length > 0 && (
-              <p className="market-event-unmatched">
-                {unmatchedHoldings.length} holding(s) could not be matched
-                because their exposure is not mapped yet.
-              </p>
+                          <span className="market-event-relevance-type">
+                            {formatRelevance(holding.relevance)}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="market-event-no-holdings">
+                    No mapped holdings matched this event.
+                  </p>
+                )}
+
+                {unmatchedHoldings.length > 0 && (
+                  <p className="market-event-unmatched">
+                    {unmatchedHoldings.length} holding(s) could not be matched
+                    because their exposure is not mapped yet.
+                  </p>
+                )}
+              </div>
             )}
           </div>
         )}
