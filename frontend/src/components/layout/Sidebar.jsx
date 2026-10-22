@@ -1,8 +1,8 @@
+
 import {
   LayoutDashboard,
   BriefcaseBusiness,
   Newspaper,
-  Bell,
   Bot,
   Settings,
 } from "lucide-react";
@@ -28,11 +28,6 @@ const navigationItems = [
     label: "News",
     icon: Newspaper,
     path: "/news",
-  },
-  {
-    label: "Alerts",
-    icon: Bell,
-    path: "/alerts",
   },
   {
     label: "AI Assistant",

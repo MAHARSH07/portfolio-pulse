@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AppLayout from "./components/layout/AppLayout";
@@ -127,16 +128,6 @@ function App() {
                 <PlaceholderPage
                   title="News"
                   description="See market and company news filtered around your portfolio."
-                />
-              }
-            />
-
-            <Route
-              path="/alerts"
-              element={
-                <PlaceholderPage
-                  title="Alerts"
-                  description="Important portfolio events and market signals will appear here."
                 />
               }
             />

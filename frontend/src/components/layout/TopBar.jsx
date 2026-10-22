@@ -1,4 +1,5 @@
-import { Bell, Search } from "lucide-react";
+
+import { Search } from "lucide-react";
 
 function TopBar() {
   return (
@@ -17,10 +18,6 @@ function TopBar() {
           <span className="market-status-dot" />
           <span>Market data</span>
         </div>
-
-        <button className="icon-button">
-          <Bell size={18} />
-        </button>
 
         <div className="profile">
           <div className="profile-avatar">M</div>
