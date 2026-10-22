@@ -1,3 +1,4 @@
+
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
   currency: "INR",
@@ -24,7 +25,22 @@ function getPriceStatusLabel(holding) {
   return "Price available";
 }
 
-function HoldingsTable({ holdings, onSelectHolding }) {
+function HoldingsTable({
+  holdings,
+  onSelectHolding,
+  limit,
+  showFooter = true,
+}) {
+  const visibleHoldings =
+    typeof limit === "number" ? holdings.slice(0, limit) : holdings;
+
+  const totalInvested = holdings.reduce(
+    (total, holding) =>
+      total +
+      Number(holding.quantity) * Number(holding.average_price),
+    0,
+  );
+
   return (
     <div className="holdings-card">
       <div className="holdings-header">
@@ -32,33 +48,35 @@ function HoldingsTable({ holdings, onSelectHolding }) {
         <span>Quantity</span>
         <span>Avg. price</span>
         <span>Current value</span>
-        <span>P&L</span>
+        <span>P&amp;L</span>
       </div>
 
       <div className="holdings-body">
-        {holdings.map((holding) => {
+        {visibleHoldings.map((holding) => {
           const hasMarketPrice = Number(holding.current_price) > 0;
 
           return (
             <button
               className="holding-row"
               key={holding.symbol}
-              onClick={() => onSelectHolding(holding.symbol)}
+              onClick={() => onSelectHolding?.(holding.symbol)}
               type="button"
             >
               <div className="stock-cell">
-                <div className="stock-avatar">{holding.symbol.charAt(0)}</div>
+                <div className="stock-avatar">
+                  {holding.symbol.charAt(0)}
+                </div>
 
                 <div className="stock-details">
                   <strong>{holding.symbol}</strong>
 
-                  {holding.company_name && <span>{holding.company_name}</span>}
-
-                  {hasMarketPrice && (
-                    <small className="price-status">
-                      {getPriceStatusLabel(holding)}
-                    </small>
+                  {holding.company_name && (
+                    <span>{holding.company_name}</span>
                   )}
+
+                  <small className="price-status">
+                    {getPriceStatusLabel(holding)}
+                  </small>
                 </div>
               </div>
 
@@ -77,14 +95,14 @@ function HoldingsTable({ holdings, onSelectHolding }) {
               <span
                 className={`table-number ${
                   hasMarketPrice
-                    ? holding.pnl >= 0
+                    ? Number(holding.pnl) >= 0
                       ? "value-positive"
                       : "value-negative"
                     : ""
                 }`}
               >
                 {hasMarketPrice
-                  ? `${holding.pnl >= 0 ? "+" : ""}${currencyFormatter.format(
+                  ? `${Number(holding.pnl) >= 0 ? "+" : ""}${currencyFormatter.format(
                       holding.pnl,
                     )}`
                   : "—"}
@@ -94,24 +112,18 @@ function HoldingsTable({ holdings, onSelectHolding }) {
         })}
       </div>
 
-      <div className="holdings-footer">
-        <span>
-          Showing {holdings.length}{" "}
-          {holdings.length === 1 ? "holding" : "holdings"}
-        </span>
+      {showFooter && (
+        <div className="holdings-footer">
+          <span>
+            Showing {visibleHoldings.length} of {holdings.length}{" "}
+            {holdings.length === 1 ? "holding" : "holdings"}
+          </span>
 
-        <span>
-          Invested value:{" "}
-          {currencyFormatter.format(
-            holdings.reduce(
-              (total, holding) =>
-                total +
-                Number(holding.quantity) * Number(holding.average_price),
-              0,
-            ),
-          )}
-        </span>
-      </div>
+          <span>
+            Invested value: {currencyFormatter.format(totalInvested)}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
