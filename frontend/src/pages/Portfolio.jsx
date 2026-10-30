@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { RefreshCw, BriefcaseBusiness } from "lucide-react";
 import HoldingsTable from "../components/portfolio/HoldingsTable";
 
+const API_URL = "http://127.0.0.1:8000";
+
 function Portfolio() {
   const [portfolio, setPortfolio] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,7 +21,21 @@ function Portfolio() {
     setError("");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/portfolio");
+      // Synchronize Groww holdings when Refresh is clicked.
+      if (isRefresh) {
+        const syncResponse = await fetch(`${API_URL}/sync/portfolio`, {
+          method: "POST",
+        });
+
+        if (!syncResponse.ok) {
+          throw new Error(
+            "Unable to synchronize holdings from Groww. Please try again.",
+          );
+        }
+      }
+
+      // Fetch the updated portfolio from PostgreSQL.
+      const response = await fetch(`${API_URL}/portfolio`);
 
       if (!response.ok) {
         throw new Error("Unable to load portfolio. Please try again.");
@@ -80,18 +96,20 @@ function Portfolio() {
             size={14}
             className={refreshing ? "refresh-icon spinning" : ""}
           />
-          <span>{refreshing ? "Refreshing..." : "Refresh"}</span>
+          <span>{refreshing ? "Syncing..." : "Refresh"}</span>
         </button>
       </header>
 
-      {loading && <div className="state-card">Loading your portfolio...</div>}
+      {loading && (
+        <div className="state-card">Loading your portfolio...</div>
+      )}
 
       {!loading && error && (
         <div className="state-card error-state">
           <p>{error}</p>
           <button
             className="refresh-button"
-            onClick={() => loadPortfolio()}
+            onClick={() => loadPortfolio(true)}
           >
             Try again
           </button>
@@ -137,6 +155,7 @@ function Portfolio() {
                   Current positions and unrealized profit or loss.
                 </p>
               </div>
+
               <span className="holding-count">
                 {portfolio.holdings.length}{" "}
                 {portfolio.holdings.length === 1 ? "holding" : "holdings"}

@@ -135,16 +135,6 @@ function AppContent() {
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/market" element={<Market />} />
 
-          <Route
-            path="/news"
-            element={
-              <PlaceholderPage
-                title="News"
-                description="See market and company news filtered around your portfolio."
-              />
-            }
-          />
-
           <Route path="/assistant" element={<Assistant />} />
 
           <Route

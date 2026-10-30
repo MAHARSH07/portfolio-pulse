@@ -25,11 +25,6 @@ const navigationItems = [
     path: "/market",
   },
   {
-    label: "News",
-    icon: Newspaper,
-    path: "/news",
-  },
-  {
     label: "AI Assistant",
     icon: Bot,
     path: "/assistant",
